@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
           </div>
           <a href="#de-prep" className="nav-link">DE PREP</a>
           <a href="#de-projects" className="nav-link">DE PROJECTS</a>
-          <a href="#newsletter" className="nav-link">NEWSLETTER</a>
+          {/* Removed Newsletter link */}
           <a href="#about-me" className="nav-link">ABOUT ME</a>
         </div>
         
@@ -35,3 +35,4 @@ const Navbar: React.FC = () => {
 };
 
 export default Navbar;
+
