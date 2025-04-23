@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Search } from 'lucide-react';
 
 const Navbar: React.FC = () => {
@@ -7,7 +8,7 @@ const Navbar: React.FC = () => {
     <nav className="w-full bg-background border-b border-gray-800">
       <div className="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <span className="font-bold text-xl">DEtermined</span>
+          <Link to="/" className="font-bold text-xl">DEtermined</Link>
         </div>
         
         <div className="hidden md:flex items-center space-x-6">
@@ -16,10 +17,9 @@ const Navbar: React.FC = () => {
             <span className="text-gray-400 text-sm">SEARCH</span>
             <span className="ml-3 px-1.5 py-0.5 text-[10px] rounded bg-gray-800 text-gray-400">⌘ K</span>
           </div>
-          <a href="#de-prep" className="nav-link">DE PREP</a>
-          <a href="#de-projects" className="nav-link">DE PROJECTS</a>
-          {/* Removed Newsletter link */}
-          <a href="#about-me" className="nav-link">ABOUT ME</a>
+          <Link to="/de-prep" className="nav-link">DE PREP</Link>
+          <Link to="/de-projects" className="nav-link">DE PROJECTS</Link>
+          <Link to="/about" className="nav-link">ABOUT ME</Link>
         </div>
         
         <div className="md:hidden">
@@ -35,4 +35,3 @@ const Navbar: React.FC = () => {
 };
 
 export default Navbar;
-
