@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { SearchCommand } from './SearchCommand';
 
 const Navbar: React.FC = () => {
   return (
@@ -12,11 +12,7 @@ const Navbar: React.FC = () => {
         </div>
         
         <div className="hidden md:flex items-center space-x-6">
-          <div className="flex items-center bg-black/40 rounded-md px-3 py-1.5">
-            <Search className="h-4 w-4 text-gray-400 mr-2" />
-            <span className="text-gray-400 text-sm">SEARCH</span>
-            <span className="ml-3 px-1.5 py-0.5 text-[10px] rounded bg-gray-800 text-gray-400">⌘ K</span>
-          </div>
+          <SearchCommand />
           <Link to="/de-prep" className="nav-link">DE PREP</Link>
           <Link to="/de-projects" className="nav-link">DE PROJECTS</Link>
           <Link to="/about" className="nav-link">ABOUT ME</Link>
