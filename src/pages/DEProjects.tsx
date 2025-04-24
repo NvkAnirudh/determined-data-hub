@@ -1,10 +1,32 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { toast } from "sonner";
 import Navbar from '../components/Navbar';
 import ProjectCard from '../components/ProjectCard';
-import { projects } from '../data/projects';
+import { fetchProjects } from '../services/projectsService';
+import { Project } from '../types';
 
 const DEProjects: React.FC = () => {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  
+  useEffect(() => {
+    const getProjects = async () => {
+      setLoading(true);
+      try {
+        const projectsData = await fetchProjects();
+        setProjects(projectsData);
+      } catch (error) {
+        console.error("Failed to fetch projects:", error);
+        toast.error("Failed to load projects. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    getProjects();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
@@ -27,11 +49,17 @@ const DEProjects: React.FC = () => {
           </a>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))}
+          </div>
+        )}
       </main>
       
       <footer className="border-t border-gray-800 py-8 mt-12">

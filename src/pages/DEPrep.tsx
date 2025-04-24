@@ -1,16 +1,55 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { toast } from "sonner";
 import Navbar from '../components/Navbar';
 import CategoryCard from '../components/CategoryCard';
 import QuestionList from '../components/QuestionList';
-import { categories, questions } from '../data/categories';
+import { fetchCategories, fetchQuestionsByCategory } from '../services/categoriesService';
+import { Category, Question } from '../types';
 
 const DEPrep: React.FC = () => {
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   
-  const filteredQuestions = selectedCategory 
-    ? questions.filter(q => q.categoryId === selectedCategory)
-    : [];
+  // Fetch categories on component mount
+  useEffect(() => {
+    const getCategories = async () => {
+      setLoading(true);
+      try {
+        const categoriesData = await fetchCategories();
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+        toast.error("Failed to load categories. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    getCategories();
+  }, []);
+  
+  // Fetch questions when a category is selected
+  useEffect(() => {
+    const getQuestions = async () => {
+      if (!selectedCategory) return;
+      
+      setLoading(true);
+      try {
+        const questionsData = await fetchQuestionsByCategory(selectedCategory);
+        setQuestions(questionsData);
+      } catch (error) {
+        console.error("Failed to fetch questions:", error);
+        toast.error("Failed to load questions. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    getQuestions();
+  }, [selectedCategory]);
   
   const selectedCategoryTitle = selectedCategory
     ? categories.find(c => c.id === selectedCategory)?.title
@@ -42,7 +81,13 @@ const DEPrep: React.FC = () => {
           </a>
         </div>
         
-        {!selectedCategory ? (
+        {loading && (
+          <div className="flex justify-center items-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+          </div>
+        )}
+        
+        {!loading && !selectedCategory ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category) => (
               <CategoryCard 
@@ -52,7 +97,9 @@ const DEPrep: React.FC = () => {
               />
             ))}
           </div>
-        ) : (
+        ) : null}
+        
+        {!loading && selectedCategory ? (
           <div>
             <button 
               onClick={() => setSelectedCategory(null)}
@@ -61,11 +108,11 @@ const DEPrep: React.FC = () => {
               ← Back to Categories
             </button>
             <QuestionList 
-              questions={filteredQuestions} 
+              questions={questions} 
               categoryTitle={selectedCategoryTitle || ""} 
             />
           </div>
-        )}
+        ) : null}
       </main>
       
       <footer className="border-t border-gray-800 py-8 mt-12">

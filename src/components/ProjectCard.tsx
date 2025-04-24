@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Project } from '../data/projects';
+import { Project } from '../types';
 
 interface ProjectCardProps {
   project: Project;
