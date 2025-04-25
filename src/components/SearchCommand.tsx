@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   CommandDialog,
@@ -9,12 +9,59 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { projects } from '../data/projects';
 import { Search } from 'lucide-react';
+import { fetchProjects } from '@/services/projectsService';
+import { fetchQuestionsByCategory } from '@/services/categoriesService';
+import { Project, Question } from '@/types';
+import { searchItems } from '@/utils/search';
+import { toast } from 'sonner';
 
 export function SearchCommand() {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [searchResults, setSearchResults] = useState<(Project | Question)[]>([]);
+  const [query, setQuery] = useState('');
+  const [allItems, setAllItems] = useState<(Project | Question)[]>([]);
   const navigate = useNavigate();
+
+  const pages = [
+    { title: 'Home', href: '/' },
+    { title: 'DE Prep', href: '/de-prep' },
+    { title: 'DE Projects', href: '/de-projects' },
+    { title: 'About Me', href: '/about' },
+  ];
+
+  // Fetch all searchable content when the component mounts
+  useEffect(() => {
+    const fetchAllContent = async () => {
+      setLoading(true);
+      try {
+        const [projects, questions] = await Promise.all([
+          fetchProjects(),
+          fetchQuestionsByCategory(''), // Empty string to fetch all questions
+        ]);
+        setAllItems([...projects, ...questions]);
+      } catch (error) {
+        console.error('Error fetching search content:', error);
+        toast.error('Failed to load search content');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllContent();
+  }, []);
+
+  // Handle search input changes
+  useEffect(() => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    
+    const results = searchItems(query, allItems);
+    setSearchResults(results);
+  }, [query, allItems]);
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -28,12 +75,14 @@ export function SearchCommand() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  const pages = [
-    { title: 'Home', href: '/' },
-    { title: 'DE Prep', href: '/de-prep' },
-    { title: 'DE Projects', href: '/de-projects' },
-    { title: 'About Me', href: '/about' },
-  ];
+  const handleSelect = (item: Project | Question | { href: string }) => {
+    if ('href' in item) {
+      navigate(item.href);
+    } else if ('url' in item) {
+      window.open(item.url, '_blank');
+    }
+    setOpen(false);
+  };
 
   return (
     <>
@@ -46,35 +95,39 @@ export function SearchCommand() {
         <span className="ml-3 px-1.5 py-0.5 text-[10px] rounded bg-gray-800 text-gray-400">⌘ K</span>
       </button>
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Type to search..." />
+        <CommandInput 
+          placeholder={loading ? "Loading..." : "Search anything..."} 
+          value={query}
+          onValueChange={setQuery}
+        />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Pages">
-            {pages.map((page) => (
-              <CommandItem
-                key={page.href}
-                onSelect={() => {
-                  navigate(page.href);
-                  setOpen(false);
-                }}
-              >
-                {page.title}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-          <CommandGroup heading="Projects">
-            {projects.map((project) => (
-              <CommandItem
-                key={project.id}
-                onSelect={() => {
-                  window.open(project.url, '_blank');
-                  setOpen(false);
-                }}
-              >
-                {project.title}
-              </CommandItem>
-            ))}
-          </CommandGroup>
+          
+          {!query && (
+            <CommandGroup heading="Pages">
+              {pages.map((page) => (
+                <CommandItem
+                  key={page.href}
+                  onSelect={() => handleSelect(page)}
+                >
+                  {page.title}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
+
+          {searchResults.length > 0 && (
+            <CommandGroup heading="Search Results">
+              {searchResults.map((item) => (
+                <CommandItem
+                  key={item.id}
+                  onSelect={() => handleSelect(item)}
+                >
+                  {'title' in item ? item.title : item.question}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
         </CommandList>
       </CommandDialog>
     </>
