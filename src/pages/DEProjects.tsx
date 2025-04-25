@@ -1,10 +1,10 @@
-
 import React, { useEffect, useState } from 'react';
 import { toast } from "sonner";
 import Navbar from '../components/Navbar';
 import ProjectCard from '../components/ProjectCard';
 import { fetchProjects } from '../services/projectsService';
 import { Project } from '../types';
+import { trackEvent } from '../utils/analytics';
 
 const DEProjects: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -27,6 +27,14 @@ const DEProjects: React.FC = () => {
     getProjects();
   }, []);
 
+  const handleSubscribeClick = () => {
+    trackEvent(
+      'click',
+      'newsletter',
+      'de_projects_subscribe'
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
@@ -44,6 +52,7 @@ const DEProjects: React.FC = () => {
             className="px-6 py-3 bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors inline-block"
             target="_blank" 
             rel="noopener noreferrer"
+            onClick={handleSubscribeClick}
           >
             Subscribe on Substack
           </a>

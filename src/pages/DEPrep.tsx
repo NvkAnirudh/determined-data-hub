@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { toast } from "sonner";
 import Navbar from '../components/Navbar';
@@ -6,6 +5,7 @@ import CategoryCard from '../components/CategoryCard';
 import QuestionList from '../components/QuestionList';
 import { fetchCategories, fetchQuestionsByCategory } from '../services/categoriesService';
 import { Category, Question } from '../types';
+import { trackEvent } from '../utils/analytics';
 
 const DEPrep: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -59,6 +59,14 @@ const DEPrep: React.FC = () => {
     setSelectedCategory(categoryId);
   };
 
+  const handleSubscribeClick = () => {
+    trackEvent(
+      'click',
+      'newsletter',
+      'de_prep_subscribe'
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
@@ -76,6 +84,7 @@ const DEPrep: React.FC = () => {
             className="px-6 py-3 bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors inline-block"
             target="_blank" 
             rel="noopener noreferrer"
+            onClick={handleSubscribeClick}
           >
             Subscribe on Substack
           </a>
