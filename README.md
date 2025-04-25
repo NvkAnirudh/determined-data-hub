@@ -37,7 +37,7 @@ This project is built with:
 
 ```sh
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/NvkAnirudh/determined-data-hub.git
 
 # Navigate to the project directory
 cd determined-data-hub
