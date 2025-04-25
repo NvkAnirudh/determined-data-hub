@@ -8,7 +8,7 @@ const About: React.FC = () => {
       <Navbar />
       
       <main className="container mx-auto px-4 md:px-6 py-12">
-        <h1 className="text-5xl font-bold mb-12">About!</h1>
+        <h1 className="text-5xl font-bold mb-12 text-center">About!</h1>
         
         <div className="card-container p-8 max-w-3xl mx-auto">
           <p className="text-gray-300 text-lg mb-6">
@@ -25,6 +25,7 @@ const About: React.FC = () => {
           your portfolio and practical skills. Subscribe to our project-focused Substack for weekly updates and new project alerts.
           </p>
 
+          <br></br>
           <p className="text-gray-300 text-lg mb-6">
           All our content is crafted by experienced data engineers to help you build practical skills and advance your career in data engineering.
           </p>
