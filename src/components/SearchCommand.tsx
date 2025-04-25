@@ -84,6 +84,10 @@ export function SearchCommand() {
     setOpen(false);
   };
 
+  const getItemTitle = (item: Project | Question): string => {
+    return 'title' in item ? item.title : item.title;
+  };
+
   return (
     <>
       <button
@@ -123,7 +127,7 @@ export function SearchCommand() {
                   key={item.id}
                   onSelect={() => handleSelect(item)}
                 >
-                  {'title' in item ? item.title : item.question}
+                  {getItemTitle(item)}
                 </CommandItem>
               ))}
             </CommandGroup>

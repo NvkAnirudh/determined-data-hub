@@ -8,15 +8,15 @@ export function searchItems(query: string, items: (Project | Question)[]): (Proj
   
   return items
     .filter(item => {
-      const titleMatch = ('title' in item ? item.title : item.question).toLowerCase().includes(searchTerm);
+      const titleMatch = ('title' in item ? item.title : item.title).toLowerCase().includes(searchTerm);
       const descriptionMatch = 'description' in item && item.description?.toLowerCase().includes(searchTerm);
       const tagsMatch = item.tags.some(tag => tag.toLowerCase().includes(searchTerm));
       
       return titleMatch || descriptionMatch || tagsMatch;
     })
     .sort((a, b) => {
-      const aTitle = ('title' in a ? a.title : a.question).toLowerCase();
-      const bTitle = ('title' in b ? b.title : b.question).toLowerCase();
+      const aTitle = ('title' in a ? a.title : a.title).toLowerCase();
+      const bTitle = ('title' in b ? b.title : b.title).toLowerCase();
       
       // Exact matches first
       if (aTitle === searchTerm) return -1;
