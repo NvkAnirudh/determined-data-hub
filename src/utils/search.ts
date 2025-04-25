@@ -9,7 +9,13 @@ type SearchResult = {
 export function searchItems(query: string, items: (Project | Question)[]): SearchResult {
   const searchTerm = query.toLowerCase().trim();
   
-  if (!searchTerm) return { questions: [], projects: [] };
+  // If there's no search term, return empty arrays
+  if (!searchTerm) {
+    return { 
+      questions: items.filter(item => !('description' in item)) as Question[],
+      projects: items.filter(item => 'description' in item) as Project[]
+    };
+  }
   
   const results = items.reduce<SearchResult>(
     (acc, item) => {

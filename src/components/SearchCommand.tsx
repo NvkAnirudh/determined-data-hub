@@ -50,17 +50,26 @@ export function SearchCommand() {
     fetchAllContent();
   }, []);
 
-  // Handle search input changes
+  // Update search results when the dialog is opened or when the query changes
   useEffect(() => {
-    if (!query.trim()) {
-      setSearchResults({ questions: [], projects: [] });
-      return;
+    // When open and no query, show all items
+    if (open) {
+      if (!query.trim()) {
+        const allQuestions = allItems.filter(item => !('description' in item)) as Question[];
+        const allProjects = allItems.filter(item => 'description' in item) as Project[];
+        setSearchResults({ 
+          questions: allQuestions, 
+          projects: allProjects 
+        });
+      } else {
+        // When there is a query, filter items
+        const results = searchItems(query, allItems);
+        setSearchResults(results);
+      }
     }
-    
-    const results = searchItems(query, allItems);
-    setSearchResults(results);
-  }, [query, allItems]);
+  }, [query, allItems, open]);
 
+  // Toggle search dialog with keyboard shortcut
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -107,13 +116,25 @@ export function SearchCommand() {
         <span className="text-gray-400 text-sm">SEARCH</span>
         <span className="ml-3 px-1.5 py-0.5 text-[10px] rounded bg-gray-800 text-gray-400">⌘ K</span>
       </button>
-      <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandDialog 
+        open={open} 
+        onOpenChange={(newOpen) => {
+          setOpen(newOpen);
+          if (newOpen) {
+            // Reset query when opening
+            setQuery('');
+          }
+        }}
+      >
         <CommandInput 
           placeholder={loading ? "Loading..." : "Search questions and projects..."} 
           value={query}
           onValueChange={setQuery}
+          autoFocus
         />
         <CommandList>
+          {loading && <div className="py-6 text-center text-sm">Loading content...</div>}
+          
           <CommandEmpty>No results found.</CommandEmpty>
           
           {searchResults.questions.length > 0 && (

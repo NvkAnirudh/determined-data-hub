@@ -24,7 +24,7 @@ const QuestionList: React.FC<QuestionListProps> = ({ questions, categoryTitle })
             <div 
               key={question.id}
               id={question.id}
-              className="card-container p-6 cursor-pointer"
+              className="card-container p-6 cursor-pointer transition-all duration-300"
               onClick={() => handleQuestionClick(question.url)}
             >
               <h4 className="text-lg font-medium mb-1">{question.title}</h4>
