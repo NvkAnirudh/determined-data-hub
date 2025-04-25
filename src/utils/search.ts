@@ -8,23 +8,26 @@ export function searchItems(query: string, items: (Project | Question)[]): (Proj
   
   return items
     .filter(item => {
-      const titleMatch = ('title' in item ? item.title : item.title).toLowerCase().includes(searchTerm);
+      // Get the title based on item type
+      const itemTitle = 'title' in item ? item.title : item.title;
+      const titleMatch = itemTitle.toLowerCase().includes(searchTerm);
       const descriptionMatch = 'description' in item && item.description?.toLowerCase().includes(searchTerm);
       const tagsMatch = item.tags.some(tag => tag.toLowerCase().includes(searchTerm));
       
       return titleMatch || descriptionMatch || tagsMatch;
     })
     .sort((a, b) => {
-      const aTitle = ('title' in a ? a.title : a.title).toLowerCase();
-      const bTitle = ('title' in b ? b.title : b.title).toLowerCase();
+      // Get titles for sorting
+      const aTitle = 'title' in a ? a.title : a.title;
+      const bTitle = 'title' in b ? b.title : b.title;
       
       // Exact matches first
-      if (aTitle === searchTerm) return -1;
-      if (bTitle === searchTerm) return 1;
+      if (aTitle.toLowerCase() === searchTerm) return -1;
+      if (bTitle.toLowerCase() === searchTerm) return 1;
       
       // Then starts with matches
-      if (aTitle.startsWith(searchTerm) && !bTitle.startsWith(searchTerm)) return -1;
-      if (bTitle.startsWith(searchTerm) && !aTitle.startsWith(searchTerm)) return 1;
+      if (aTitle.toLowerCase().startsWith(searchTerm) && !bTitle.toLowerCase().startsWith(searchTerm)) return -1;
+      if (bTitle.toLowerCase().startsWith(searchTerm) && !aTitle.toLowerCase().startsWith(searchTerm)) return 1;
       
       // Then by date
       return new Date(b.date).getTime() - new Date(a.date).getTime();

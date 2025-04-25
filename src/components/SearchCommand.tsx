@@ -85,7 +85,9 @@ export function SearchCommand() {
   };
 
   const getItemTitle = (item: Project | Question): string => {
-    return 'title' in item ? item.title : item.title;
+    // Both Project and Question types should have a title property
+    // This ensures TypeScript understands we're accessing a valid property
+    return item.title;
   };
 
   return (
