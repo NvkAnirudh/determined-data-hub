@@ -14,10 +14,16 @@ export function searchItems(query: string, items: (Project | Question)[]): (Proj
       // Check for description (only Projects have this)
       const descriptionMatch = 'description' in item && item.description?.toLowerCase().includes(searchTerm);
       
+      // Check question text (only Questions have this)
+      const questionTextMatch = !('description' in item) && item.title.toLowerCase().includes(searchTerm);
+      
       // Check tags
       const tagsMatch = item.tags.some(tag => tag.toLowerCase().includes(searchTerm));
       
-      return titleMatch || descriptionMatch || tagsMatch;
+      // Check categoryId (only Questions have this)
+      const categoryMatch = 'categoryId' in item && item.categoryId.toLowerCase().includes(searchTerm);
+      
+      return titleMatch || descriptionMatch || questionTextMatch || tagsMatch || categoryMatch;
     })
     .sort((a, b) => {
       // Both types have title property

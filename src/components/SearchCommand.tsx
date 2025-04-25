@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/command";
 import { Search } from 'lucide-react';
 import { fetchProjects } from '@/services/projectsService';
-import { fetchQuestionsByCategory } from '@/services/categoriesService';
+import { fetchQuestionsByCategory, fetchCategories } from '@/services/categoriesService';
 import { Project, Question } from '@/types';
 import { searchItems } from '@/utils/search';
 import { toast } from 'sonner';
@@ -22,6 +22,7 @@ export function SearchCommand() {
   const [searchResults, setSearchResults] = useState<(Project | Question)[]>([]);
   const [query, setQuery] = useState('');
   const [allItems, setAllItems] = useState<(Project | Question)[]>([]);
+  const [categories, setCategories] = useState<Record<string, string>>({});
   const navigate = useNavigate();
 
   const pages = [
@@ -36,10 +37,19 @@ export function SearchCommand() {
     const fetchAllContent = async () => {
       setLoading(true);
       try {
-        const [projects, questions] = await Promise.all([
+        const [projects, questions, categoriesList] = await Promise.all([
           fetchProjects(),
           fetchQuestionsByCategory(''), // Empty string to fetch all questions
+          fetchCategories(),
         ]);
+        
+        // Create a map of category IDs to their names for easier lookup
+        const categoryMap: Record<string, string> = {};
+        categoriesList.forEach(category => {
+          categoryMap[category.id] = category.title;
+        });
+        setCategories(categoryMap);
+        
         setAllItems([...projects, ...questions]);
       } catch (error) {
         console.error('Error fetching search content:', error);
@@ -76,18 +86,35 @@ export function SearchCommand() {
   }, []);
 
   const handleSelect = (item: Project | Question | { href: string }) => {
+    setOpen(false);
+    
     if ('href' in item) {
       navigate(item.href);
     } else if ('url' in item) {
-      window.open(item.url, '_blank');
+      // For items with direct URLs (like projects or questions with substack links)
+      if ('categoryId' in item) {
+        // It's a question - navigate to the DE Prep page
+        navigate(`/de-prep?q=${encodeURIComponent(query)}&categoryId=${item.categoryId}`);
+      } else {
+        // It's a project - navigate to the DE Projects page
+        navigate(`/de-projects?q=${encodeURIComponent(query)}`);
+      }
     }
-    setOpen(false);
   };
 
   const getItemTitle = (item: Project | Question): string => {
-    // Both Project and Question types should have a title property
-    // This ensures TypeScript understands we're accessing a valid property
     return item.title;
+  };
+
+  const getItemDescription = (item: Project | Question): string => {
+    if ('description' in item) {
+      // It's a project
+      return `Project - ${item.description?.substring(0, 100)}${item.description?.length > 100 ? '...' : ''}`;
+    } else if ('categoryId' in item) {
+      // It's a question
+      return `Question - ${categories[item.categoryId] || 'General'}`;
+    }
+    return '';
   };
 
   return (
@@ -128,8 +155,10 @@ export function SearchCommand() {
                 <CommandItem
                   key={item.id}
                   onSelect={() => handleSelect(item)}
+                  className="flex flex-col items-start"
                 >
-                  {getItemTitle(item)}
+                  <div className="font-medium">{getItemTitle(item)}</div>
+                  <div className="text-sm text-gray-500 mt-1">{getItemDescription(item)}</div>
                 </CommandItem>
               ))}
             </CommandGroup>

@@ -21,7 +21,8 @@ export async function fetchCategories(): Promise<Category[]> {
 }
 
 export async function fetchQuestionsByCategory(categoryId: string): Promise<Question[]> {
-  const { data, error } = await supabase
+  // If categoryId is empty, fetch all questions
+  const query = supabase
     .from('questions')
     .select(`
       *,
@@ -29,8 +30,14 @@ export async function fetchQuestionsByCategory(categoryId: string): Promise<Ques
         tag_id,
         tags(name)
       )
-    `)
-    .eq('category_id', categoryId);
+    `);
+  
+  // Only filter by categoryId if it's provided
+  if (categoryId) {
+    query.eq('category_id', categoryId);
+  }
+  
+  const { data, error } = await query;
   
   if (error) {
     console.error('Error fetching questions:', error);
