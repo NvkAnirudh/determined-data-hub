@@ -67,12 +67,12 @@ const DEPrep: React.FC = () => {
         <h1 className="text-5xl font-bold mb-12">DE Prep</h1>
         
         <div className="mb-10 p-6 card-container">
-          <h2 className="text-2xl font-semibold mb-4">Want daily and weekly Data Engineering Q&amp;A delivered?</h2>
+          <h2 className="text-2xl font-semibold mb-4">Want daily Data Engineering Q&amp;A delivered?</h2>
           <p className="mb-6 text-gray-300">
             Stay updated with the latest interview questions, knowledge nuggets, and tips for advancing your data engineering career.
           </p>
           <a 
-            href="https://substack.com" 
+            href="https://deprep.substack.com/" 
             className="px-6 py-3 bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors inline-block"
             target="_blank" 
             rel="noopener noreferrer"

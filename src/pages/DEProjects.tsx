@@ -40,7 +40,7 @@ const DEProjects: React.FC = () => {
             Get notified when new data engineering projects are added, complete with step-by-step tutorials and code examples.
           </p>
           <a 
-            href="https://substack.com" 
+            href="https://deprojects.substack.com/" 
             className="px-6 py-3 bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors inline-block"
             target="_blank" 
             rel="noopener noreferrer"

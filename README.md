@@ -1,56 +1,22 @@
-# Welcome to your Lovable project
+# DEtermined - Data Engineering Resource Hub
 
-## Project info
+## About
 
-**URL**: https://lovable.dev/projects/9a590ae4-e4e4-4598-960c-62ad7bfcc209
+DEtermined is your comprehensive resource for data engineering excellence. The platform offers:
 
-## How can I edit this code?
+- **DE Prep**: Curated data engineering interview questions organized by categories
+- **DE Projects**: Hands-on data engineering projects with step-by-step walkthroughs and code examples
 
-There are several ways of editing your application.
+All content is linked to dedicated Substack newsletters for regular updates and in-depth discussions.
 
-**Use Lovable**
+## Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/9a590ae4-e4e4-4598-960c-62ad7bfcc209) and start prompting.
+- Interview question database organized by category
+- Project walkthroughs with comprehensive code examples
+- Substack integration for daily Q&A and weekly project updates
+- Modern, responsive UI built with React and Tailwind CSS
 
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
+## Technologies Used
 
 This project is built with:
 
@@ -59,15 +25,55 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Supabase
 
-## How can I deploy this project?
+## Getting Started
 
-Simply open [Lovable](https://lovable.dev/projects/9a590ae4-e4e4-4598-960c-62ad7bfcc209) and click on Share -> Publish.
+### Prerequisites
 
-## Can I connect a custom domain to my Lovable project?
+- Node.js & npm - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-Yes, you can!
+### Installation
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+```sh
+# Clone the repository
+git clone <repository-url>
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+# Navigate to the project directory
+cd determined-data-hub
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+The application will be available at `http://localhost:5173` or the port specified in your environment.
+
+## Project Structure
+
+```
+determined-data-hub/
+├── src/
+│   ├── components/     # Reusable UI components
+│   ├── pages/          # Application pages (DEPrep, DEProjects, About)
+│   ├── services/       # API and data services
+│   ├── types/          # TypeScript type definitions
+│   └── ...
+├── public/             # Static assets
+└── ...
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+- Thanks to all contributors who have helped build and maintain this project
+- Special thanks to the data engineering community for continuous inspiration
