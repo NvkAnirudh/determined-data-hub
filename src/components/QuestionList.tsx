@@ -23,6 +23,7 @@ const QuestionList: React.FC<QuestionListProps> = ({ questions, categoryTitle })
           {questions.map((question) => (
             <div 
               key={question.id}
+              id={question.id}
               className="card-container p-6 cursor-pointer"
               onClick={() => handleQuestionClick(question.url)}
             >

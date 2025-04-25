@@ -1,44 +1,51 @@
 
 import { Project, Question } from "@/types";
 
-export function searchItems(query: string, items: (Project | Question)[]): (Project | Question)[] {
+type SearchResult = {
+  questions: Question[];
+  projects: Project[];
+};
+
+export function searchItems(query: string, items: (Project | Question)[]): SearchResult {
   const searchTerm = query.toLowerCase().trim();
   
-  if (!searchTerm) return [];
+  if (!searchTerm) return { questions: [], projects: [] };
   
-  return items
-    .filter(item => {
-      // Get the title - both Project and Question types have a title property
+  const results = items.reduce<SearchResult>(
+    (acc, item) => {
       const titleMatch = item.title.toLowerCase().includes(searchTerm);
-      
-      // Check for description (only Projects have this)
       const descriptionMatch = 'description' in item && item.description?.toLowerCase().includes(searchTerm);
-      
-      // Check question text (only Questions have this)
-      const questionTextMatch = !('description' in item) && item.title.toLowerCase().includes(searchTerm);
-      
-      // Check tags
       const tagsMatch = item.tags.some(tag => tag.toLowerCase().includes(searchTerm));
       
-      // Check categoryId (only Questions have this)
-      const categoryMatch = 'categoryId' in item && item.categoryId.toLowerCase().includes(searchTerm);
+      if (titleMatch || descriptionMatch || tagsMatch) {
+        if ('description' in item) {
+          acc.projects.push(item as Project);
+        } else {
+          acc.questions.push(item as Question);
+        }
+      }
       
-      return titleMatch || descriptionMatch || questionTextMatch || tagsMatch || categoryMatch;
-    })
-    .sort((a, b) => {
-      // Both types have title property
-      const aTitle = a.title.toLowerCase();
-      const bTitle = b.title.toLowerCase();
-      
-      // Exact matches first
-      if (aTitle === searchTerm) return -1;
-      if (bTitle === searchTerm) return 1;
-      
-      // Then starts with matches
-      if (aTitle.startsWith(searchTerm) && !bTitle.startsWith(searchTerm)) return -1;
-      if (bTitle.startsWith(searchTerm) && !aTitle.startsWith(searchTerm)) return 1;
-      
-      // Then by date
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
-    });
+      return acc;
+    },
+    { questions: [], projects: [] }
+  );
+  
+  // Sort results by title match priority
+  const sortByTitle = (a: Project | Question, b: Project | Question) => {
+    const aTitle = a.title.toLowerCase();
+    const bTitle = b.title.toLowerCase();
+    
+    if (aTitle === searchTerm) return -1;
+    if (bTitle === searchTerm) return 1;
+    
+    if (aTitle.startsWith(searchTerm) && !bTitle.startsWith(searchTerm)) return -1;
+    if (bTitle.startsWith(searchTerm) && !aTitle.startsWith(searchTerm)) return 1;
+    
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  };
+
+  results.questions.sort(sortByTitle);
+  results.projects.sort(sortByTitle);
+  
+  return results;
 }

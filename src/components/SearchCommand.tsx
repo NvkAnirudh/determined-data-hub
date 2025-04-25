@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   CommandDialog,
   CommandEmpty,
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/command";
 import { Search } from 'lucide-react';
 import { fetchProjects } from '@/services/projectsService';
-import { fetchQuestionsByCategory, fetchCategories } from '@/services/categoriesService';
+import { fetchQuestionsByCategory } from '@/services/categoriesService';
 import { Project, Question } from '@/types';
 import { searchItems } from '@/utils/search';
 import { toast } from 'sonner';
@@ -19,36 +19,24 @@ import { toast } from 'sonner';
 export function SearchCommand() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [searchResults, setSearchResults] = useState<(Project | Question)[]>([]);
   const [query, setQuery] = useState('');
   const [allItems, setAllItems] = useState<(Project | Question)[]>([]);
-  const [categories, setCategories] = useState<Record<string, string>>({});
+  const [searchResults, setSearchResults] = useState<{ questions: Question[], projects: Project[] }>({ 
+    questions: [], 
+    projects: [] 
+  });
   const navigate = useNavigate();
-
-  const pages = [
-    { title: 'Home', href: '/' },
-    { title: 'DE Prep', href: '/de-prep' },
-    { title: 'DE Projects', href: '/de-projects' },
-    { title: 'About Me', href: '/about' },
-  ];
+  const location = useLocation();
 
   // Fetch all searchable content when the component mounts
   useEffect(() => {
     const fetchAllContent = async () => {
       setLoading(true);
       try {
-        const [projects, questions, categoriesList] = await Promise.all([
+        const [projects, questions] = await Promise.all([
           fetchProjects(),
           fetchQuestionsByCategory(''), // Empty string to fetch all questions
-          fetchCategories(),
         ]);
-        
-        // Create a map of category IDs to their names for easier lookup
-        const categoryMap: Record<string, string> = {};
-        categoriesList.forEach(category => {
-          categoryMap[category.id] = category.title;
-        });
-        setCategories(categoryMap);
         
         setAllItems([...projects, ...questions]);
       } catch (error) {
@@ -65,7 +53,7 @@ export function SearchCommand() {
   // Handle search input changes
   useEffect(() => {
     if (!query.trim()) {
-      setSearchResults([]);
+      setSearchResults({ questions: [], projects: [] });
       return;
     }
     
@@ -85,36 +73,28 @@ export function SearchCommand() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  const handleSelect = (item: Project | Question | { href: string }) => {
+  const handleSelect = (item: Project | Question) => {
     setOpen(false);
     
-    if ('href' in item) {
-      navigate(item.href);
-    } else if ('url' in item) {
-      // For items with direct URLs (like projects or questions with substack links)
-      if ('categoryId' in item) {
-        // It's a question - navigate to the DE Prep page
-        navigate(`/de-prep?q=${encodeURIComponent(query)}&categoryId=${item.categoryId}`);
-      } else {
-        // It's a project - navigate to the DE Projects page
-        navigate(`/de-projects?q=${encodeURIComponent(query)}`);
-      }
-    }
-  };
-
-  const getItemTitle = (item: Project | Question): string => {
-    return item.title;
-  };
-
-  const getItemDescription = (item: Project | Question): string => {
     if ('description' in item) {
-      // It's a project
-      return `Project - ${item.description?.substring(0, 100)}${item.description?.length > 100 ? '...' : ''}`;
-    } else if ('categoryId' in item) {
-      // It's a question
-      return `Question - ${categories[item.categoryId] || 'General'}`;
+      // It's a project - navigate to projects page
+      const isAlreadyOnProjectsPage = location.pathname === '/de-projects';
+      navigate(`/de-projects${isAlreadyOnProjectsPage ? '?refresh=true' : ''}`);
+    } else {
+      // It's a question - navigate to prep page with category
+      const isAlreadyOnPrepPage = location.pathname === '/de-prep';
+      navigate(`/de-prep${isAlreadyOnPrepPage ? '?refresh=true' : ''}&categoryId=${item.categoryId}`);
     }
-    return '';
+    
+    // Add a small delay to ensure the navigation has completed
+    setTimeout(() => {
+      const element = document.getElementById(item.id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.classList.add('highlight');
+        setTimeout(() => element.classList.remove('highlight'), 2000);
+      }
+    }, 100);
   };
 
   return (
@@ -129,36 +109,45 @@ export function SearchCommand() {
       </button>
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput 
-          placeholder={loading ? "Loading..." : "Search anything..."} 
+          placeholder={loading ? "Loading..." : "Search questions and projects..."} 
           value={query}
           onValueChange={setQuery}
         />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
           
-          {!query && (
-            <CommandGroup heading="Pages">
-              {pages.map((page) => (
+          {searchResults.questions.length > 0 && (
+            <CommandGroup heading="Questions">
+              {searchResults.questions.map((question) => (
                 <CommandItem
-                  key={page.href}
-                  onSelect={() => handleSelect(page)}
+                  key={question.id}
+                  onSelect={() => handleSelect(question)}
                 >
-                  {page.title}
+                  <div className="flex flex-col">
+                    <div className="font-medium">{question.title}</div>
+                    <div className="text-sm text-gray-500">
+                      {question.tags.slice(0, 2).join(', ')}
+                    </div>
+                  </div>
                 </CommandItem>
               ))}
             </CommandGroup>
           )}
 
-          {searchResults.length > 0 && (
-            <CommandGroup heading="Search Results">
-              {searchResults.map((item) => (
+          {searchResults.projects.length > 0 && (
+            <CommandGroup heading="Projects">
+              {searchResults.projects.map((project) => (
                 <CommandItem
-                  key={item.id}
-                  onSelect={() => handleSelect(item)}
-                  className="flex flex-col items-start"
+                  key={project.id}
+                  onSelect={() => handleSelect(project)}
                 >
-                  <div className="font-medium">{getItemTitle(item)}</div>
-                  <div className="text-sm text-gray-500 mt-1">{getItemDescription(item)}</div>
+                  <div className="flex flex-col">
+                    <div className="font-medium">{project.title}</div>
+                    <div className="text-sm text-gray-500">
+                      {project.description?.substring(0, 60)}
+                      {project.description && project.description.length > 60 ? '...' : ''}
+                    </div>
+                  </div>
                 </CommandItem>
               ))}
             </CommandGroup>

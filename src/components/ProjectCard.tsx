@@ -13,6 +13,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
 
   return (
     <div 
+      id={project.id}
       className="card-container card-hover cursor-pointer"
       onClick={handleProjectClick}
     >
