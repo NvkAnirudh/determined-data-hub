@@ -8,14 +8,14 @@ const Navbar: React.FC = () => {
     <nav className="w-full bg-background border-b border-gray-800">
       <div className="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Link to="/" className="font-bold text-xl">DEtermined</Link>
+          <Link to="/" className="font-bold text-xl">DEtermined.eng</Link>
         </div>
         
         <div className="hidden md:flex items-center space-x-6">
           <SearchCommand />
           <Link to="/de-prep" className="nav-link">DE PREP</Link>
           <Link to="/de-projects" className="nav-link">DE PROJECTS</Link>
-          <Link to="/about" className="nav-link">ABOUT ME</Link>
+          <Link to="/about" className="nav-link">ABOUT</Link>
         </div>
         
         <div className="md:hidden">
