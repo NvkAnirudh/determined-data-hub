@@ -33,7 +33,7 @@ const About: React.FC = () => {
           
           <div className="mt-8 text-center">
             <a 
-              href="https://substack.com" 
+              href="https://substack.com/@anirudhnuti?utm_source=user-menu" 
               className="px-6 py-3 bg-white text-black font-medium rounded-md hover:bg-gray-200 transition-colors inline-block"
               target="_blank" 
               rel="noopener noreferrer"
