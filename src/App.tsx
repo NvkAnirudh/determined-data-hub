@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import DEPrep from "./pages/DEPrep";
 import DEProjects from "./pages/DEProjects";
+import QuestionDetail from "./pages/QuestionDetail";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
@@ -30,6 +31,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <DEPrep />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/de-prep/question/:questionId"
+              element={
+                <ProtectedRoute>
+                  <QuestionDetail />
                 </ProtectedRoute>
               }
             />

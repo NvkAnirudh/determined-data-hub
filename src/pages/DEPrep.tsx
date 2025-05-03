@@ -1,17 +1,27 @@
+
 import React, { useState, useEffect } from 'react';
 import { toast } from "sonner";
 import Navbar from '../components/Navbar';
 import CategoryCard from '../components/CategoryCard';
 import QuestionList from '../components/QuestionList';
 import { fetchCategories, fetchQuestionsByCategory } from '../services/categoriesService';
-import { Category, Question } from '../types';
+import { Category, Question, DifficultyLevel } from '../types';
 import { trackEvent } from '../utils/analytics';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const DEPrep: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [difficultyFilter, setDifficultyFilter] = useState<DifficultyLevel | 'all'>('all');
   
   // Fetch categories on component mount
   useEffect(() => {
@@ -40,6 +50,7 @@ const DEPrep: React.FC = () => {
       try {
         const questionsData = await fetchQuestionsByCategory(selectedCategory);
         setQuestions(questionsData);
+        setFilteredQuestions(questionsData);
       } catch (error) {
         console.error("Failed to fetch questions:", error);
         toast.error("Failed to load questions. Please try again later.");
@@ -51,12 +62,23 @@ const DEPrep: React.FC = () => {
     getQuestions();
   }, [selectedCategory]);
   
+  // Apply difficulty filter when it changes
+  useEffect(() => {
+    if (difficultyFilter === 'all') {
+      setFilteredQuestions(questions);
+    } else {
+      setFilteredQuestions(questions.filter(q => q.difficulty === difficultyFilter));
+    }
+  }, [difficultyFilter, questions]);
+  
   const selectedCategoryTitle = selectedCategory
     ? categories.find(c => c.id === selectedCategory)?.title
     : "";
 
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId);
+    // Reset difficulty filter when changing category
+    setDifficultyFilter('all');
   };
 
   const handleSubscribeClick = () => {
@@ -116,8 +138,37 @@ const DEPrep: React.FC = () => {
             >
               ← Back to Categories
             </button>
+            
+            <div className="mb-6">
+              <div className="flex items-center space-x-4 mb-4">
+                <h2 className="text-lg font-medium">Filter by difficulty:</h2>
+                <Select 
+                  value={difficultyFilter} 
+                  onValueChange={(value: string) => 
+                    setDifficultyFilter(value as DifficultyLevel | 'all')
+                  }
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select difficulty" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Difficulties</SelectItem>
+                    <SelectItem value="easy">Easy</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="hard">Hard</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="text-sm text-gray-400">
+                Showing {filteredQuestions.length} 
+                {difficultyFilter !== 'all' ? ` ${difficultyFilter}` : ''} 
+                {filteredQuestions.length === 1 ? ' question' : ' questions'}
+              </div>
+            </div>
+            
             <QuestionList 
-              questions={questions} 
+              questions={filteredQuestions} 
               categoryTitle={selectedCategoryTitle || ""} 
             />
           </div>

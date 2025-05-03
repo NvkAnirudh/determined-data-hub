@@ -1,5 +1,7 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Badge } from '@/components/ui/badge';
 import { Question } from '../types';
 
 interface QuestionListProps {
@@ -8,8 +10,19 @@ interface QuestionListProps {
 }
 
 const QuestionList: React.FC<QuestionListProps> = ({ questions, categoryTitle }) => {
-  const handleQuestionClick = (url: string) => {
-    window.open(url, '_blank');
+  const navigate = useNavigate();
+
+  const handleQuestionClick = (question: Question) => {
+    navigate(`/de-prep/question/${question.id}`);
+  };
+
+  const getDifficultyColor = (difficulty: string | undefined) => {
+    switch (difficulty) {
+      case 'easy': return 'bg-green-500 hover:bg-green-400';
+      case 'medium': return 'bg-yellow-500 hover:bg-yellow-400';
+      case 'hard': return 'bg-red-500 hover:bg-red-400';
+      default: return 'bg-gray-500 hover:bg-gray-400';
+    }
   };
 
   return (
@@ -25,10 +38,15 @@ const QuestionList: React.FC<QuestionListProps> = ({ questions, categoryTitle })
               key={question.id}
               id={question.id}
               className="card-container p-6 cursor-pointer transition-all duration-300"
-              onClick={() => handleQuestionClick(question.url)}
+              onClick={() => handleQuestionClick(question)}
             >
               <h4 className="text-lg font-medium mb-1">{question.title}</h4>
-              <p className="text-gray-400 text-sm">{question.date}</p>
+              <div className="flex flex-wrap gap-2 mb-2">
+                <span className="text-gray-400 text-sm">{question.date}</span>
+                <Badge className={`text-xs ${getDifficultyColor(question.difficulty)}`}>
+                  {question.difficulty || 'medium'}
+                </Badge>
+              </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 {question.tags.map((tag, index) => (
                   <span 
