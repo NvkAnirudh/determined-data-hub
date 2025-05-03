@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { Category, Question } from "../types";
+import { Category, Question, DifficultyLevel } from "../types";
 
 export async function fetchCategories(): Promise<Category[]> {
   // First, get categories
@@ -73,7 +73,7 @@ export async function fetchQuestionsByCategory(categoryId: string): Promise<Ques
     date: formatDate(question.created_at),
     url: question.substack_link || 'https://determined.substack.com/',
     tags: question.question_tags.map((qt: any) => qt.tags.name),
-    difficulty: question.difficulty || 'medium',
+    difficulty: (question.difficulty || 'medium') as DifficultyLevel,
   }));
 }
 

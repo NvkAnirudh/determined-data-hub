@@ -47,7 +47,7 @@ const ConfidenceScoreForm: React.FC<ConfidenceScoreFormProps> = ({ questionId })
       }
 
       if (data) {
-        setSavedScore(data);
+        setSavedScore(data as UserQuestionConfidence);
         setConfidenceScore(data.score);
       }
     } catch (error) {

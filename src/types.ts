@@ -29,8 +29,8 @@ export type Project = {
 
 export type UserQuestionConfidence = {
   id: string;
-  userId: string;
-  questionId: string;
+  user_id: string;
+  question_id: string;
   score: number;
-  updatedAt: string;
+  updated_at: string;
 };

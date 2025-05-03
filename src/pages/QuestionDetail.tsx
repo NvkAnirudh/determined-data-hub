@@ -4,7 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
 import Navbar from '../components/Navbar';
 import ConfidenceScoreForm from '../components/ConfidenceScoreForm';
-import { Question } from '../types';
+import { Button } from '@/components/ui/button';
+import { Question, DifficultyLevel } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { trackEvent } from '@/utils/analytics';
 import { Badge } from "@/components/ui/badge";
@@ -44,7 +45,7 @@ const QuestionDetail: React.FC = () => {
             date: formatDate(data.created_at),
             url: data.substack_link || 'https://determined.substack.com/',
             tags: data.question_tags.map((qt: any) => qt.tags.name),
-            difficulty: data.difficulty || 'medium',
+            difficulty: (data.difficulty || 'medium') as DifficultyLevel,
           });
           
           // Track view event
