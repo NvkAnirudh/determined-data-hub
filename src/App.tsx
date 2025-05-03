@@ -9,6 +9,9 @@ import DEPrep from "./pages/DEPrep";
 import DEProjects from "./pages/DEProjects";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -18,14 +21,31 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/de-prep" element={<DEPrep />} />
-          <Route path="/de-projects" element={<DEProjects />} />
-          <Route path="/about" element={<About />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route
+              path="/de-prep"
+              element={
+                <ProtectedRoute>
+                  <DEPrep />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/de-projects"
+              element={
+                <ProtectedRoute>
+                  <DEProjects />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/about" element={<About />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

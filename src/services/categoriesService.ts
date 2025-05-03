@@ -3,21 +3,43 @@ import { supabase } from "@/integrations/supabase/client";
 import { Category, Question } from "../types";
 
 export async function fetchCategories(): Promise<Category[]> {
-  const { data, error } = await supabase
+  // First, get categories
+  const { data: categoriesData, error: categoriesError } = await supabase
     .from('categories')
     .select('*')
     .order('name');
   
-  if (error) {
-    console.error('Error fetching categories:', error);
+  if (categoriesError) {
+    console.error('Error fetching categories:', categoriesError);
     return [];
   }
-  
-  return data.map(category => ({
-    id: category.id,
-    title: category.name,
-    description: getCategoryDescription(category.name)
+
+  // Then, count questions for each category
+  const categoriesWithCounts = await Promise.all(categoriesData.map(async (category) => {
+    const { count, error: countError } = await supabase
+      .from('questions')
+      .select('*', { count: 'exact', head: true })
+      .eq('category_id', category.id);
+    
+    if (countError) {
+      console.error(`Error counting questions for category ${category.name}:`, countError);
+      return {
+        id: category.id,
+        title: category.name,
+        description: getCategoryDescription(category.name),
+        questionCount: 0
+      };
+    }
+    
+    return {
+      id: category.id,
+      title: category.name,
+      description: getCategoryDescription(category.name),
+      questionCount: count || 0
+    };
   }));
+  
+  return categoriesWithCounts;
 }
 
 export async function fetchQuestionsByCategory(categoryId: string): Promise<Question[]> {
@@ -50,7 +72,8 @@ export async function fetchQuestionsByCategory(categoryId: string): Promise<Ques
     title: question.question,
     date: formatDate(question.created_at),
     url: question.substack_link || 'https://determined.substack.com/',
-    tags: question.question_tags.map((qt: any) => qt.tags.name)
+    tags: question.question_tags.map((qt: any) => qt.tags.name),
+    difficulty: question.difficulty || 'medium',
   }));
 }
 
