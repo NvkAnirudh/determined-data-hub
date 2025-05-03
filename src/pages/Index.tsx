@@ -1,16 +1,13 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-
 const Index: React.FC = () => {
-  return (
-    <div className="min-h-screen bg-background text-foreground">
+  return <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       
       <main className="container mx-auto px-4 md:px-6 py-12">
         <div className="flex flex-col items-center justify-center py-20">
-          <h1 className="text-5xl font-bold mb-8">DEtermined</h1>
+          <h1 className="text-5xl mb-8 font-bold text-inherit">DEtermined</h1>
           <p className="text-xl text-gray-400 mb-12 max-w-2xl text-center">
             Your go-to resource for data engineering knowledge, projects, and community.
           </p>
@@ -45,8 +42,6 @@ const Index: React.FC = () => {
           <p>© {new Date().getFullYear()} DEtermined. All rights reserved.</p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
