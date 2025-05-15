@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { toast } from "sonner";
+import { useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import CategoryCard from '../components/CategoryCard';
 import QuestionList from '../components/QuestionList';
@@ -25,6 +26,7 @@ const DEPrep: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyLevel | 'all'>('all');
   const { user } = useAuth();
+  const location = useLocation();
   
   // Fetch categories on component mount
   useEffect(() => {
@@ -33,6 +35,13 @@ const DEPrep: React.FC = () => {
       try {
         const categoriesData = await fetchCategories();
         setCategories(categoriesData);
+        
+        // Check if we have a categoryId from navigation state
+        const categoryIdFromState = location.state?.selectedCategoryId;
+        if (categoryIdFromState) {
+          setSelectedCategory(categoryIdFromState);
+        }
+        
       } catch (error) {
         console.error("Failed to fetch categories:", error);
         toast.error("Failed to load categories. Please try again later.");
@@ -42,7 +51,7 @@ const DEPrep: React.FC = () => {
     };
     
     getCategories();
-  }, []);
+  }, [location.state]);
   
   // Fetch questions when a category is selected
   useEffect(() => {
@@ -80,6 +89,8 @@ const DEPrep: React.FC = () => {
 
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId);
+    // Save the selected category ID for back navigation
+    sessionStorage.setItem('lastVisitedCategoryId', categoryId);
     // Reset difficulty filter when changing category
     setDifficultyFilter('all');
   };

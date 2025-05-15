@@ -13,7 +13,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onClick }) => {
   
   return (
     <div 
-      className="card-container card-hover cursor-pointer"
+      className="card-container card-hover cursor-pointer rounded-lg"
       onClick={() => onClick(category.id)}
     >
       <div className="p-6">

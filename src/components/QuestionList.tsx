@@ -1,6 +1,5 @@
-
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Question } from '../types';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,10 +11,17 @@ interface QuestionListProps {
 
 const QuestionList: React.FC<QuestionListProps> = ({ questions, categoryTitle }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
 
   const handleQuestionClick = (question: Question) => {
-    navigate(`/de-prep/question/${question.id}`);
+    // Save the current scroll position before navigating
+    sessionStorage.setItem('scrollPosition', window.scrollY.toString());
+    sessionStorage.setItem('lastVisitedCategoryId', question.categoryId);
+    
+    navigate(`/de-prep/question/${question.id}`, {
+      state: { fromList: true }
+    });
   };
 
   const getDifficultyColor = (difficulty: string | undefined) => {
@@ -26,6 +32,16 @@ const QuestionList: React.FC<QuestionListProps> = ({ questions, categoryTitle })
       default: return 'bg-gray-500 hover:bg-gray-400';
     }
   };
+
+  // Restore scroll position when returning to the list
+  useEffect(() => {
+    const scrollPosition = sessionStorage.getItem('scrollPosition');
+    if (scrollPosition) {
+      window.scrollTo(0, parseInt(scrollPosition));
+      // Only use the stored position once
+      sessionStorage.removeItem('scrollPosition');
+    }
+  }, []);
 
   return (
     <div className="mt-8">
@@ -39,7 +55,7 @@ const QuestionList: React.FC<QuestionListProps> = ({ questions, categoryTitle })
             <div 
               key={question.id}
               id={question.id}
-              className="card-container p-6 cursor-pointer transition-all duration-300"
+              className="card-container p-6 cursor-pointer transition-all duration-300 rounded-lg hover:shadow-md"
               onClick={() => handleQuestionClick(question)}
             >
               <h4 className="text-lg font-medium mb-1">{question.title}</h4>

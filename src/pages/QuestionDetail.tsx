@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from "sonner";
 import Navbar from '../components/Navbar';
 import ConfidenceScoreForm from '../components/ConfidenceScoreForm';
@@ -17,7 +17,12 @@ const QuestionDetail: React.FC = () => {
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
+  const [animateIn, setAnimateIn] = useState<boolean>(false);
+  
+  // Track if we came from the list view for animation purposes
+  const fromList = location.state?.fromList || false;
 
   useEffect(() => {
     const getQuestionDetail = async () => {
@@ -59,6 +64,8 @@ const QuestionDetail: React.FC = () => {
         toast.error("Failed to load question details. Please try again.");
       } finally {
         setLoading(false);
+        // Start animation after loading
+        setTimeout(() => setAnimateIn(true), 10);
       }
     };
     
@@ -88,13 +95,29 @@ const QuestionDetail: React.FC = () => {
     trackEvent('click', 'read_full_answer', questionId || '');
   };
 
+  const handleGoBack = () => {
+    // If we have a stored category ID, use that for navigation
+    const lastCategoryId = sessionStorage.getItem('lastVisitedCategoryId');
+    if (lastCategoryId) {
+      navigate('/de-prep', { state: { selectedCategoryId: lastCategoryId } });
+    } else {
+      navigate(-1);
+    }
+  };
+
+  const cardClasses = `card-container p-6 ${
+    fromList && animateIn 
+      ? 'transition-all duration-500 ease-in-out transform rounded-lg' 
+      : 'rounded-lg'
+  }`;
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       
       <main className="container mx-auto px-4 md:px-6 py-12">
         <button 
-          onClick={() => navigate(-1)}
+          onClick={handleGoBack}
           className="mb-8 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-md transition-colors"
         >
           ← Back
@@ -108,7 +131,7 @@ const QuestionDetail: React.FC = () => {
           </div>
         ) : question ? (
           <div>
-            <div className="card-container p-6">
+            <div className={cardClasses}>
               {user && (
                 <div className="flex flex-wrap gap-2 mb-4">
                   <Badge variant="outline" className="text-xs">
