@@ -4,9 +4,11 @@ import { toast } from "sonner";
 import Navbar from '../components/Navbar';
 import CategoryCard from '../components/CategoryCard';
 import QuestionList from '../components/QuestionList';
+import AuthPrompt from '../components/AuthPrompt';
 import { fetchCategories, fetchQuestionsByCategory } from '../services/categoriesService';
 import { Category, Question, DifficultyLevel } from '../types';
 import { trackEvent } from '../utils/analytics';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   Select,
   SelectContent,
@@ -22,6 +24,7 @@ const DEPrep: React.FC = () => {
   const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [difficultyFilter, setDifficultyFilter] = useState<DifficultyLevel | 'all'>('all');
+  const { user } = useAuth();
   
   // Fetch categories on component mount
   useEffect(() => {
@@ -96,6 +99,8 @@ const DEPrep: React.FC = () => {
       <main className="container mx-auto px-4 md:px-6 py-12">
         <h1 className="text-5xl font-bold mb-12">DE Prep</h1>
         
+        {!user && <AuthPrompt />}
+        
         <div className="mb-10 p-6 card-container">
           <h2 className="text-2xl font-semibold mb-4">Want daily Data Engineering Q&amp;A delivered?</h2>
           <p className="mb-6 text-gray-300">
@@ -139,33 +144,35 @@ const DEPrep: React.FC = () => {
               ← Back to Categories
             </button>
             
-            <div className="mb-6">
-              <div className="flex items-center space-x-4 mb-4">
-                <h2 className="text-lg font-medium">Filter by difficulty:</h2>
-                <Select 
-                  value={difficultyFilter} 
-                  onValueChange={(value: string) => 
-                    setDifficultyFilter(value as DifficultyLevel | 'all')
-                  }
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select difficulty" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Difficulties</SelectItem>
-                    <SelectItem value="easy">Easy</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="hard">Hard</SelectItem>
-                  </SelectContent>
-                </Select>
+            {user && (
+              <div className="mb-6">
+                <div className="flex items-center space-x-4 mb-4">
+                  <h2 className="text-lg font-medium">Filter by difficulty:</h2>
+                  <Select 
+                    value={difficultyFilter} 
+                    onValueChange={(value: string) => 
+                      setDifficultyFilter(value as DifficultyLevel | 'all')
+                    }
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select difficulty" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Difficulties</SelectItem>
+                      <SelectItem value="easy">Easy</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="hard">Hard</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="text-sm text-gray-400">
+                  Showing {filteredQuestions.length} 
+                  {difficultyFilter !== 'all' ? ` ${difficultyFilter}` : ''} 
+                  {filteredQuestions.length === 1 ? ' question' : ' questions'}
+                </div>
               </div>
-              
-              <div className="text-sm text-gray-400">
-                Showing {filteredQuestions.length} 
-                {difficultyFilter !== 'all' ? ` ${difficultyFilter}` : ''} 
-                {filteredQuestions.length === 1 ? ' question' : ' questions'}
-              </div>
-            </div>
+            )}
             
             <QuestionList 
               questions={filteredQuestions} 

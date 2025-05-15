@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Question } from '../types';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface QuestionListProps {
   questions: Question[];
@@ -11,6 +12,7 @@ interface QuestionListProps {
 
 const QuestionList: React.FC<QuestionListProps> = ({ questions, categoryTitle }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleQuestionClick = (question: Question) => {
     navigate(`/de-prep/question/${question.id}`);
@@ -43,9 +45,11 @@ const QuestionList: React.FC<QuestionListProps> = ({ questions, categoryTitle })
               <h4 className="text-lg font-medium mb-1">{question.title}</h4>
               <div className="flex flex-wrap gap-2 mb-2">
                 <span className="text-gray-400 text-sm">{question.date}</span>
-                <Badge className={`text-xs ${getDifficultyColor(question.difficulty)}`}>
-                  {question.difficulty || 'medium'}
-                </Badge>
+                {user && question.difficulty && (
+                  <Badge className={`text-xs ${getDifficultyColor(question.difficulty)}`}>
+                    {question.difficulty || 'medium'}
+                  </Badge>
+                )}
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 {question.tags.map((tag, index) => (

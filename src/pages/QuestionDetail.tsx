@@ -4,17 +4,20 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
 import Navbar from '../components/Navbar';
 import ConfidenceScoreForm from '../components/ConfidenceScoreForm';
+import AuthPrompt from '../components/AuthPrompt';
 import { Button } from '@/components/ui/button';
 import { Question, DifficultyLevel } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { trackEvent } from '@/utils/analytics';
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from '@/contexts/AuthContext';
 
 const QuestionDetail: React.FC = () => {
   const { questionId } = useParams<{ questionId: string }>();
   const [question, setQuestion] = useState<Question | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const getQuestionDetail = async () => {
@@ -97,6 +100,8 @@ const QuestionDetail: React.FC = () => {
           ← Back
         </button>
         
+        {!user && <AuthPrompt message="Sign up to access full question details, difficulty information, and track your confidence levels." />}
+        
         {loading ? (
           <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
@@ -104,14 +109,16 @@ const QuestionDetail: React.FC = () => {
         ) : question ? (
           <div>
             <div className="card-container p-6">
-              <div className="flex flex-wrap gap-2 mb-4">
-                <Badge variant="outline" className="text-xs">
-                  {question.date}
-                </Badge>
-                <Badge className={`text-xs ${getDifficultyColor(question.difficulty || 'medium')}`}>
-                  {question.difficulty || 'medium'}
-                </Badge>
-              </div>
+              {user && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <Badge variant="outline" className="text-xs">
+                    {question.date}
+                  </Badge>
+                  <Badge className={`text-xs ${getDifficultyColor(question.difficulty || 'medium')}`}>
+                    {question.difficulty || 'medium'}
+                  </Badge>
+                </div>
+              )}
               
               <h1 className="text-2xl md:text-3xl font-bold mb-6">{question.title}</h1>
               
@@ -126,13 +133,15 @@ const QuestionDetail: React.FC = () => {
                 ))}
               </div>
               
-              <Button onClick={handleReadFullAnswer}>
-                Read Full Answer on Substack
-              </Button>
+              {user && (
+                <Button onClick={handleReadFullAnswer}>
+                  Read Full Answer on Substack
+                </Button>
+              )}
             </div>
             
-            {/* Confidence score component */}
-            <ConfidenceScoreForm questionId={question.id} />
+            {/* Confidence score component - only shown to authenticated users */}
+            {user && <ConfidenceScoreForm questionId={question.id} />}
           </div>
         ) : (
           <div className="text-center py-12">
