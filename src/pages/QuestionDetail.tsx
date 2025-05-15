@@ -19,11 +19,9 @@ const QuestionDetail: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
-  const [animateIn, setAnimateIn] = useState<boolean>(false);
   
-  // Track if we came from the list view for animation purposes
-  const fromList = location.state?.fromList || false;
-
+  // Removed animation states since we're disabling the animation
+  
   useEffect(() => {
     const getQuestionDetail = async () => {
       if (!questionId) return;
@@ -64,8 +62,6 @@ const QuestionDetail: React.FC = () => {
         toast.error("Failed to load question details. Please try again.");
       } finally {
         setLoading(false);
-        // Start animation after loading
-        setTimeout(() => setAnimateIn(true), 10);
       }
     };
     
@@ -105,11 +101,8 @@ const QuestionDetail: React.FC = () => {
     }
   };
 
-  const cardClasses = `card-container p-6 ${
-    fromList && animateIn 
-      ? 'transition-all duration-500 ease-in-out transform rounded-lg' 
-      : 'rounded-lg'
-  }`;
+  // Use a simple card container with no animation classes
+  const cardClasses = "card-container p-6 rounded-lg";
 
   return (
     <div className="min-h-screen bg-background text-foreground">
