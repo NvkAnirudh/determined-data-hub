@@ -90,9 +90,8 @@ export function SearchCommand() {
       const isAlreadyOnProjectsPage = location.pathname === '/de-projects';
       navigate(`/de-projects${isAlreadyOnProjectsPage ? '?refresh=true' : ''}`);
     } else {
-      // It's a question - navigate to prep page with category
-      const isAlreadyOnPrepPage = location.pathname === '/de-prep';
-      navigate(`/de-prep${isAlreadyOnPrepPage ? '?refresh=true' : ''}&categoryId=${item.categoryId}`);
+      // It's a question - navigate directly to the question detail page
+      navigate(`/de-prep/question/${item.id}`);
     }
     
     // Add a small delay to ensure the navigation has completed

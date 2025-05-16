@@ -3,7 +3,10 @@ export type Category = {
   id: string;
   title: string;
   description: string;
+  questionCount?: number;
 };
+
+export type DifficultyLevel = 'easy' | 'medium' | 'hard';
 
 export type Question = {
   id: string;
@@ -12,6 +15,7 @@ export type Question = {
   date: string;
   url: string;
   tags: string[];
+  difficulty?: DifficultyLevel;
 };
 
 export type Project = {
@@ -21,4 +25,12 @@ export type Project = {
   date: string;
   url: string;
   tags: string[];
+};
+
+export type UserQuestionConfidence = {
+  id: string;
+  user_id: string;
+  question_id: string;
+  score: number;
+  updated_at: string;
 };
