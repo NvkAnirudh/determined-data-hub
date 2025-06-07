@@ -12,6 +12,7 @@ import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import SQLPlayground from "./pages/SQLPlayground";
+import SQLDungeon from "./pages/SQLDungeon";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -42,6 +43,7 @@ const App = () => (
             />
             <Route path="/about" element={<About />} />
             <Route path="/sql-playground" element={<SQLPlayground />} />
+            <Route path="/sql-dungeon" element={<SQLDungeon />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
